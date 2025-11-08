@@ -52,15 +52,17 @@ describe("Production Code Bug Fix Validation", () => {
   });
 
   describe("Decoration Disposal Fix", () => {
-    test("should check decoration.get_stage() before manipulation", () => {
-      // Verify decoration validation is present
-      expect(treeJsContent).toMatch(/decoration\.get_stage\(\)\s*!==\s*null/);
-      expect(treeJsContent).toMatch(/Decoration\s*not\s*in\s*stage,\s*nullifying\s*reference/);
+    test("should clean decoration when CON node is removed", () => {
+      // Verify decoration cleanup is present in removeChild
+      expect(treeJsContent).toMatch(/node\.isCon\(\)\s*&&\s*node\.decoration/);
+      expect(treeJsContent).toMatch(/global\.window_group\.remove_child\(node\.decoration\)/);
+      expect(treeJsContent).toMatch(/node\.decoration\.destroy\(\)/);
     });
 
-    test("should check tab widget validity", () => {
-      expect(treeJsContent).toMatch(/child\.tab\s*&&\s*child\.tab\.get_stage\(\)\s*!==\s*null/);
-      expect(treeJsContent).toMatch(/Tab\s*widget\s*disposed,\s*nullifying\s*reference/);
+    test("should have emergency cleanup command", () => {
+      // Verify NukeOrphanedDecorations command exists
+      expect(windowJsContent).toMatch(/case\s+"NukeOrphanedDecorations":/);
+      expect(windowJsContent).toMatch(/child\.type\s*===\s*"forge-deco"/);
     });
   });
 });

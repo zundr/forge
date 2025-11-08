@@ -350,5 +350,10 @@
         <key type="as" name="window-resize-right-decrease">
             <default><![CDATA[['<Ctrl><Shift><Super>y']]]></default>
         </key>
+
+        <key type="as" name="nuke-orphaned-decorations">
+            <default><![CDATA[['<Ctrl><Shift><Super>Delete']]]></default>
+            <summary>Emergency cleanup for orphaned tab decorations</summary>
+        </key>
     </schema>
 </schemalist>
