@@ -26,6 +26,7 @@ import { KeyboardPage } from "./lib/prefs/keyboard.js";
 import { AppearancePage } from "./lib/prefs/appearance.js";
 import { SettingsPage } from "./lib/prefs/settings.js";
 import { FloatingPage } from "./lib/prefs/floating.js";
+import { WorkspacePage } from "./lib/prefs/workspace.js";
 
 export default class ForgeExtensionPreferences extends ExtensionPreferences {
   settings = this.getSettings();
@@ -47,6 +48,7 @@ export default class ForgeExtensionPreferences extends ExtensionPreferences {
     window.add(new AppearancePage(this));
     window.add(new KeyboardPage(this));
     window.add(new FloatingPage(this));
+    window.add(new WorkspacePage(this));
     window.search_enabled = true;
     window.can_navigate_back = true;
   }
