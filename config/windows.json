@@ -18,13 +18,21 @@
     { "wmClass": "Guake", "mode": "float" },
     { "wmClass": "zoom", "mode": "float" },
     { "wmClass": "firefox", "wmTitle": "About Mozilla Firefox", "mode": "float" },
-    { "wmClass": "firefox", "wmTitle": "!Mozilla Firefox", "mode": "float" },
+    { "wmClass": "firefox", "wmTitle": "!Mozilla Firefox,!Floorp", "mode": "float" },
     {
       "wmClass": "org.mozilla.firefox.desktop",
       "wmTitle": "About Mozilla Firefox",
       "mode": "float"
     },
-    { "wmClass": "org.mozilla.firefox.desktop", "wmTitle": "!Mozilla Firefox", "mode": "float" },
+    {
+      "wmClass": "org.mozilla.firefox.desktop",
+      "wmTitle": "!Mozilla Firefox,!Floorp",
+      "mode": "float"
+    },
+    { "wmClass": "floorp", "wmTitle": "About Floorp", "mode": "float" },
+    { "wmClass": "floorp", "wmTitle": "Preferences", "mode": "float" },
+    { "wmClass": "Floorp", "wmTitle": "About Floorp", "mode": "float" },
+    { "wmClass": "Floorp", "wmTitle": "Preferences", "mode": "float" },
     { "wmClass": "thunderbird", "wmTitle": "About Mozilla Thunderbird", "mode": "float" },
     { "wmClass": "thunderbird", "wmTitle": "!Mozilla Thunderbird", "mode": "float" },
     {
