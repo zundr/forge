@@ -1,0 +1,324 @@
+#!/usr/bin/env gjs
+
+/**
+ * Forge Tree Dump CLI
+ * Dumps the current Forge window tree structure with Unicode box-drawing
+ */
+
+imports.gi.versions.Gtk = "4.0";
+const { Gio, GLib } = imports.gi;
+const System = imports.system;
+
+// Tree Formatter Functions (inlined for simplicity)
+
+/**
+ * Get Unicode prefix for tree visualization
+ */
+function getPrefix(depth, isLast, isLastArray) {
+  if (depth === 0) {
+    return "";
+  }
+
+  let prefix = "";
+
+  for (let i = 0; i < isLastArray.length; i++) {
+    if (isLastArray[i]) {
+      prefix += "    ";
+    } else {
+      prefix += "│   ";
+    }
+  }
+
+  if (isLast) {
+    prefix += "└── ";
+  } else {
+    prefix += "├── ";
+  }
+
+  return prefix;
+}
+
+/**
+ * Format node attributes based on type and options
+ */
+function formatAttributes(node, options = {}) {
+  const parts = [];
+
+  if (node.nodeType === "WINDOW") {
+    const metaWindow = node.nodeValue;
+    const wmClass = metaWindow.get_wm_class ? metaWindow.get_wm_class() : "unknown";
+    const title = metaWindow.get_title ? metaWindow.get_title() : "unknown";
+    const id = metaWindow.get_id ? metaWindow.get_id() : "unknown";
+
+    parts.push(`class:${wmClass}`);
+    parts.push(`title:"${title}"`);
+    parts.push(`id:${id}`);
+
+    if (options.mode || options.verbose) {
+      parts.push(`mode:${node.mode}`);
+    }
+
+    if ((options.rect || options.verbose) && node.rect) {
+      const r = node.rect;
+      parts.push(`rect:${r.width}x${r.height}+${r.x}+${r.y}`);
+    }
+  } else if (node.nodeType === "CON" || node.nodeType === "MONITOR") {
+    if (node.layout) {
+      parts.push(`[${node.layout}]`);
+    }
+
+    if ((options.rect || options.verbose) && node.rect) {
+      const r = node.rect;
+      parts.push(`rect:${r.width}x${r.height}+${r.x}+${r.y}`);
+    }
+  }
+
+  return parts.join(" ");
+}
+
+/**
+ * Format a single node with proper indentation
+ */
+function formatNode(node, depth, isLast, isLastArray, options = {}) {
+  const prefix = getPrefix(depth, isLast, isLastArray);
+  const nodeType = node.nodeType;
+  const nodeValue = node.nodeValue;
+
+  let line = prefix + nodeType;
+
+  if (nodeType === "WORKSPACE" || nodeType === "MONITOR") {
+    line += " " + nodeValue;
+  }
+
+  const attrs = formatAttributes(node, options);
+  if (attrs) {
+    line += " " + attrs;
+  }
+
+  return line;
+}
+
+/**
+ * Format entire tree recursively
+ */
+function formatTree(node, options = {}, depth = 0, isLastArray = []) {
+  const lines = [];
+
+  const isLast = depth > 0 && isLastArray[isLastArray.length - 1];
+  const line = formatNode(node, depth, isLast, isLastArray.slice(0, -1), options);
+  lines.push(line);
+
+  if (node.childNodes && node.childNodes.length > 0) {
+    node.childNodes.forEach((child, index) => {
+      const isLastChild = index === node.childNodes.length - 1;
+      const newIsLastArray = [...isLastArray, isLastChild];
+      const childOutput = formatTree(child, options, depth + 1, newIsLastArray);
+      lines.push(childOutput);
+    });
+  }
+
+  return lines.join("\n");
+}
+
+const HELP_TEXT = `
+Usage: forge-tree-dump [OPTIONS]
+
+Dump the Forge window tree structure with Unicode box-drawing characters.
+
+Options:
+  -v, --verbose     Show all attributes (mode, rect, layout)
+  -r, --rect        Show rectangle dimensions
+  -m, --mode        Show window modes
+  -l, --layout      Show container layouts
+  -h, --help        Show this help message
+
+Examples:
+  forge-tree-dump                 # Basic tree output
+  forge-tree-dump --verbose       # Show all attributes
+  forge-tree-dump --rect --mode   # Show rectangles and modes
+`;
+
+/**
+ * Parse command-line arguments
+ * @param {string[]} argv - Command-line arguments
+ * @returns {Object} Parsed options
+ */
+function parseArgs(argv) {
+  const options = {
+    verbose: false,
+    rect: false,
+    mode: false,
+    layout: false,
+    help: false,
+  };
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+
+    switch (arg) {
+      case "-h":
+      case "--help":
+        options.help = true;
+        break;
+      case "-v":
+      case "--verbose":
+        options.verbose = true;
+        break;
+      case "-r":
+      case "--rect":
+        options.rect = true;
+        break;
+      case "-m":
+      case "--mode":
+        options.mode = true;
+        break;
+      case "-l":
+      case "--layout":
+        options.layout = true;
+        break;
+      default:
+        if (arg.startsWith("-")) {
+          printerr(`Error: Unknown option: ${arg}`);
+          printerr(HELP_TEXT);
+          System.exit(3);
+        }
+    }
+  }
+
+  return options;
+}
+
+/**
+ * Get tree from running Forge extension via D-Bus
+ * @returns {Object|null} Tree structure or null if not available
+ */
+function getTreeFromExtension() {
+  try {
+    // Try to connect to GNOME Shell D-Bus interface
+    const proxy = Gio.DBusProxy.new_for_bus_sync(
+      Gio.BusType.SESSION,
+      Gio.DBusProxyFlags.NONE,
+      null,
+      "org.gnome.Shell",
+      "/org/gnome/Shell/Extensions/Forge",
+      "org.gnome.Shell.Extensions.Forge",
+      null
+    );
+
+    // Call GetTree method
+    const result = proxy.call_sync("GetTree", null, Gio.DBusCallFlags.NONE, -1, null);
+
+    if (result) {
+      const [treeJson] = result.deep_unpack();
+      return JSON.parse(treeJson);
+    }
+  } catch (e) {
+    // D-Bus interface not available
+    return null;
+  }
+
+  return null;
+}
+
+/**
+ * Create mock tree for testing when extension is not running
+ * @returns {Object} Mock tree structure
+ */
+function getMockTree() {
+  return {
+    nodeType: "ROOT",
+    childNodes: [
+      {
+        nodeType: "WORKSPACE",
+        nodeValue: "ws0",
+        childNodes: [
+          {
+            nodeType: "MONITOR",
+            nodeValue: "mo0ws0",
+            layout: "HSPLIT",
+            rect: { x: 0, y: 0, width: 1920, height: 1080 },
+            childNodes: [
+              {
+                nodeType: "WINDOW",
+                nodeValue: {
+                  get_wm_class: () => "firefox",
+                  get_title: () => "Mozilla Firefox",
+                  get_id: () => 12345,
+                },
+                mode: "TILE",
+                rect: { x: 0, y: 0, width: 960, height: 1080 },
+                childNodes: [],
+              },
+              {
+                nodeType: "CON",
+                nodeValue: "container1",
+                layout: "VSPLIT",
+                rect: { x: 960, y: 0, width: 960, height: 1080 },
+                childNodes: [
+                  {
+                    nodeType: "WINDOW",
+                    nodeValue: {
+                      get_wm_class: () => "gnome-terminal-server",
+                      get_title: () => "Terminal",
+                      get_id: () => 12346,
+                    },
+                    mode: "TILE",
+                    rect: { x: 960, y: 0, width: 960, height: 540 },
+                    childNodes: [],
+                  },
+                  {
+                    nodeType: "WINDOW",
+                    nodeValue: {
+                      get_wm_class: () => "code",
+                      get_title: () => "Visual Studio Code",
+                      get_id: () => 12347,
+                    },
+                    mode: "TILE",
+                    rect: { x: 960, y: 540, width: 960, height: 540 },
+                    childNodes: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+}
+
+/**
+ * Main entry point
+ */
+function main(argv) {
+  // In GJS, ARGV doesn't include the script name, so use it directly
+  let args = argv;
+
+  // Parse arguments
+  const options = parseArgs(args);
+
+  // Show help if requested
+  if (options.help) {
+    print(HELP_TEXT);
+    return 0;
+  }
+
+  // Get tree from extension
+  let tree = getTreeFromExtension();
+
+  if (!tree) {
+    printerr("Warning: Forge extension is not running or D-Bus interface not available.");
+    printerr("Using mock tree for demonstration purposes.\n");
+    tree = getMockTree();
+  }
+
+  // Format and print tree
+  const output = formatTree(tree, options);
+  print(output);
+
+  return 0;
+}
+
+// Run main function
+const exitCode = main(ARGV);
+System.exit(exitCode);
