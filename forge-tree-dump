@@ -46,9 +46,11 @@ function formatAttributes(node, options = {}) {
 
   if (node.nodeType === "WINDOW") {
     const metaWindow = node.nodeValue;
-    const wmClass = metaWindow.get_wm_class ? metaWindow.get_wm_class() : "unknown";
-    const title = metaWindow.get_title ? metaWindow.get_title() : "unknown";
-    const id = metaWindow.get_id ? metaWindow.get_id() : "unknown";
+    // Handle both serialized (from D-Bus) and mock objects
+    const wmClass =
+      metaWindow.wmClass || (metaWindow.get_wm_class ? metaWindow.get_wm_class() : "unknown");
+    const title = metaWindow.title || (metaWindow.get_title ? metaWindow.get_title() : "unknown");
+    const id = metaWindow.id || (metaWindow.get_id ? metaWindow.get_id() : "unknown");
 
     parts.push(`class:${wmClass}`);
     parts.push(`title:"${title}"`);

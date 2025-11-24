@@ -29,6 +29,7 @@ import { Keybindings } from "./lib/extension/keybindings.js";
 import { WindowManager } from "./lib/extension/window.js";
 import { FeatureIndicator, FeatureMenuToggle } from "./lib/extension/indicator.js";
 import { ExtensionThemeManager } from "./lib/extension/extension-theme-manager.js";
+import { ForgeDBus } from "./lib/extension/dbus-interface.js";
 
 export default class ForgeExtension extends Extension {
   enable() {
@@ -48,6 +49,7 @@ export default class ForgeExtension extends Extension {
     this.theme.patchCss();
     this.theme.reloadStylesheet();
     this.extWm.enable();
+    this.dbus = new ForgeDBus(this);
     Logger.info(`enable: finalized vars`);
   }
 
@@ -61,8 +63,10 @@ export default class ForgeExtension extends Extension {
     }
 
     this._removeIndicator();
+    this.dbus?.destroy();
     this.extWm?.disable();
     this.keybindings?.disable();
+    this.dbus = null;
     this.keybindings = null;
     this.extWm = null;
     this.themeWm = null;
