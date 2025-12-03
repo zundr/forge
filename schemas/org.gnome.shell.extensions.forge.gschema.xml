@@ -139,6 +139,10 @@
             <default>true</default>
             <summary>Enable auto split or quarter-tiling based based on smaller side</summary>
         </key>
+        <key type="b" name="condense-redundant-containers">
+            <default>true</default>
+            <summary>Automatically condense redundant nested containers with same layout</summary>
+        </key>
         <key type="b" name="preview-hint-enabled">
             <default>true</default>
             <summary>Whether to show preview hint DND</summary>
@@ -151,6 +155,21 @@
         <key type="u" name="window-overrides-reload-trigger">
             <default>0</default>
             <summary>Timestamp to trigger window overrides reload</summary>
+        </key>
+
+        <key type="u" name="workspace-rules-reload-trigger">
+            <default>0</default>
+            <summary>Timestamp to trigger workspace rules reload</summary>
+        </key>
+
+        <key type="u" name="workspace-reorganize-trigger">
+            <default>0</default>
+            <summary>Timestamp to trigger workspace reorganization</summary>
+        </key>
+
+        <key type="b" name="panel-reorganize-button-enabled">
+            <default>false</default>
+            <summary>Show reorganize button in panel</summary>
         </key>
 
     </schema>
@@ -354,6 +373,11 @@
         <key type="as" name="nuke-orphaned-decorations">
             <default><![CDATA[['<Ctrl><Shift><Super>Delete']]]></default>
             <summary>Emergency cleanup for orphaned tab decorations</summary>
+        </key>
+
+        <key type="as" name="workspace-reorganize">
+            <default><![CDATA[['<Ctrl><Shift><Super>r']]]></default>
+            <summary>Reorganize windows to their configured workspaces</summary>
         </key>
     </schema>
 </schemalist>

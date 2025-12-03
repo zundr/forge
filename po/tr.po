@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Forge\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-06 13:15-0300\n"
+"POT-Creation-Date: 2025-12-01 21:08-0800\n"
 "PO-Revision-Date: 2025-08-22 12:00+0300\n"
 "Last-Translator: Mucahit Sahin <mucahitsahin786@gmail.com>\n"
 "Language-Team: Turkish\n"
@@ -15,33 +15,38 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-#: lib/extension/indicator.js:47 lib/prefs/settings.js:55
+#: lib/extension/indicator.js:49 lib/prefs/settings.js:55
 msgid "Tiling"
 msgstr "Döşeme"
 
-#: lib/extension/indicator.js:66 lib/prefs/settings.js:24
+#: lib/extension/indicator.js:68 lib/prefs/settings.js:24
 msgid "Forge"
 msgstr "Forge"
 
-#: lib/extension/indicator.js:66
+#: lib/extension/indicator.js:68
 msgid "Tiling Window Management"
 msgstr "Döşeme Pencere Yönetimi"
 
-#: lib/extension/indicator.js:70
+#: lib/extension/indicator.js:72
 msgid "Gaps Hidden when Single"
 msgstr "Tek Pencerede Boşluklar Gizli"
 
-#: lib/extension/indicator.js:78
+#: lib/extension/indicator.js:80
 msgid "Show Focus Hint Border"
 msgstr "Odak İpucu Kenarlığını Göster"
 
-#: lib/extension/indicator.js:86
+#: lib/extension/indicator.js:88
 msgid "Move Pointer with the Focus"
 msgstr "İmleci Odakla Birlikte Taşı"
 
-#: lib/extension/indicator.js:94 lib/extension/window.js:67
+#: lib/extension/indicator.js:96 lib/extension/window.js:67
 msgid "Settings"
 msgstr "Ayarlar"
+
+#: lib/extension/indicator.js:139 lib/prefs/workspace.js:123
+#, fuzzy
+msgid "Reorganize Windows"
+msgstr "Yüzen pencere"
 
 #: lib/prefs/appearance.js:29
 msgid "Tiled window"
@@ -252,77 +257,93 @@ msgid "Places new windows in a clock-wise fashion"
 msgstr "Yeni pencereleri saat yönünde yerleştirir"
 
 #: lib/prefs/settings.js:83
+msgid "Condense redundant containers"
+msgstr ""
+
+#: lib/prefs/settings.js:84
+msgid "Automatically flatten nested containers with same layout type"
+msgstr ""
+
+#: lib/prefs/settings.js:90
 msgid "Stacked tiling"
 msgstr "Yığılmış döşeme"
 
-#: lib/prefs/settings.js:84
+#: lib/prefs/settings.js:91
 msgid "Stacks windows on top of each other while still tiling them"
 msgstr "Pencereleri döşerken birbirinin üzerine yığar"
 
-#: lib/prefs/settings.js:90
+#: lib/prefs/settings.js:97
 msgid "Tabbed tiling"
 msgstr "Sekmeli döşeme"
 
-#: lib/prefs/settings.js:91
+#: lib/prefs/settings.js:98
 msgid "Groups windows as tabs"
 msgstr "Pencereleri sekme olarak gruplar"
 
-#: lib/prefs/settings.js:97
+#: lib/prefs/settings.js:104
 msgid "Auto exit tabbed tiling"
 msgstr "Sekmeli döşemeden otomatik çık"
 
-#: lib/prefs/settings.js:98
+#: lib/prefs/settings.js:105
 msgid "Exit tabbed tiling mode when only a single tab remains"
 msgstr "Sadece tek sekme kaldığında sekmeli döşeme modundan çık"
 
-#: lib/prefs/settings.js:104
+#: lib/prefs/settings.js:111
 msgid "Drag-and-drop behavior"
 msgstr "Sürükle-bırak davranışı"
 
-#: lib/prefs/settings.js:105
+#: lib/prefs/settings.js:112
 msgid "What to do when dragging one window on top of another"
 msgstr "Bir pencereyi diğerinin üzerine sürüklerken ne yapılacağı"
 
-#: lib/prefs/settings.js:110
+#: lib/prefs/settings.js:117
 msgid "Swap"
 msgstr "Takas"
 
-#: lib/prefs/settings.js:111
+#: lib/prefs/settings.js:118
 msgid "Tabbed"
 msgstr "Sekmeli"
 
-#: lib/prefs/settings.js:112
+#: lib/prefs/settings.js:119
 msgid "Stacked"
 msgstr "Yığılmış"
 
-#: lib/prefs/settings.js:116
+#: lib/prefs/settings.js:123
 msgid "Always on Top mode for floating windows"
 msgstr "Yüzen pencereler için Her Zaman Üstte modu"
 
-#: lib/prefs/settings.js:117
+#: lib/prefs/settings.js:124
 msgid "Makes floating windows appear above tiled windows"
 msgstr "Yüzen pencerelerin döşenmiş pencerelerin üzerinde görünmesini sağlar"
 
-#: lib/prefs/settings.js:125
+#: lib/prefs/settings.js:130
+msgid "Show reorganize button in panel"
+msgstr ""
+
+#: lib/prefs/settings.js:131
+msgid "Adds a button to the panel to reorganize windows by workspace rules"
+msgstr ""
+
+#: lib/prefs/settings.js:138
 msgid "Non-tiling workspaces"
 msgstr "Döşeme yapılmayan çalışma alanları"
 
-#: lib/prefs/settings.js:126
+#: lib/prefs/settings.js:139
 msgid ""
 "Disables tiling on specified workspaces. Starts from 0, separated by commas"
 msgstr ""
 "Belirtilen çalışma alanlarında döşemeyi devre dışı bırakır. 0'dan başlar, "
 "virgülle ayrılır"
 
-#: lib/prefs/settings.js:129
+#: lib/prefs/settings.js:142
 msgid "Example: 0,1,2"
 msgstr "Örnek: 0,1,2"
 
-#: lib/prefs/settings.js:137
+#: lib/prefs/settings.js:150
 msgid "Logger"
 msgstr "Günlükçü"
 
-#: lib/prefs/settings.js:140
+#: lib/prefs/settings.js:153
 msgid "Log level"
 msgstr "Günlük seviyesi"
 
@@ -344,6 +365,77 @@ msgstr "Varsayılana sıfırla"
 
 #: lib/prefs/widgets.js:258
 msgid "Remove Item"
+msgstr ""
+
+#: lib/prefs/workspace.js:25 lib/prefs/workspace.js:242
+#, javascript-format
+msgid "Workspace %d"
+msgstr ""
+
+#: lib/prefs/workspace.js:49
+msgid "Move up"
+msgstr ""
+
+#: lib/prefs/workspace.js:58
+msgid "Move down"
+msgstr ""
+
+#: lib/prefs/workspace.js:67
+msgid "Remove"
+msgstr ""
+
+#: lib/prefs/workspace.js:87
+msgid "Workspace"
+msgstr ""
+
+#: lib/prefs/workspace.js:96
+msgid "Workspace Placement"
+msgstr ""
+
+#: lib/prefs/workspace.js:98
+msgid ""
+"Rules match windows by Class (required) and Title (optional). Use 'xprop "
+"WM_CLASS' (X11) or Looking Glass (Wayland) to find window class."
+msgstr ""
+
+#: lib/prefs/workspace.js:116
+msgid "Add Rule"
+msgstr ""
+
+#: lib/prefs/workspace.js:124
+msgid "Move all windows to their configured workspaces"
+msgstr ""
+
+#: lib/prefs/workspace.js:166
+msgid "Edit Workspace Rule"
+msgstr ""
+
+#: lib/prefs/workspace.js:166
+msgid "Add Workspace Rule"
+msgstr ""
+
+#: lib/prefs/workspace.js:180
+msgid "Window Class (e.g., firefox)"
+msgstr ""
+
+#: lib/prefs/workspace.js:187
+msgid "Window Title (optional)"
+msgstr ""
+
+#: lib/prefs/workspace.js:204
+msgid "Workspace:"
+msgstr ""
+
+#: lib/prefs/workspace.js:215
+msgid "Cancel"
+msgstr ""
+
+#: lib/prefs/workspace.js:216
+msgid "Save"
+msgstr ""
+
+#: lib/prefs/workspace.js:216
+msgid "Add"
 msgstr ""
 
 #, fuzzy

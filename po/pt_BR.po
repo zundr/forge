@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Forge\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-06 13:15-0300\n"
+"POT-Creation-Date: 2025-12-01 21:08-0800\n"
 "PO-Revision-Date: 2021-09-18 16:25-0400\n"
 "Last-Translator: Juarez Rudsatz <juarezr@gmail.com>\n"
 "Language-Team: \n"
@@ -12,34 +12,39 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: lib/extension/indicator.js:47 lib/prefs/settings.js:55
+#: lib/extension/indicator.js:49 lib/prefs/settings.js:55
 msgid "Tiling"
 msgstr "Emparelhamento"
 
-#: lib/extension/indicator.js:66 lib/prefs/settings.js:24
+#: lib/extension/indicator.js:68 lib/prefs/settings.js:24
 msgid "Forge"
 msgstr "Forge"
 
-#: lib/extension/indicator.js:66
+#: lib/extension/indicator.js:68
 msgid "Tiling Window Management"
 msgstr "Gerenciamento de Janelas Emparelhadas"
 
-#: lib/extension/indicator.js:70
+#: lib/extension/indicator.js:72
 msgid "Gaps Hidden when Single"
 msgstr "Espaçamento Omitido quando Sozinho"
 
-#: lib/extension/indicator.js:78
+#: lib/extension/indicator.js:80
 #, fuzzy
 msgid "Show Focus Hint Border"
 msgstr "Sinalizador de Foco Flutuante"
 
-#: lib/extension/indicator.js:86
+#: lib/extension/indicator.js:88
 msgid "Move Pointer with the Focus"
 msgstr "Mover o Ponteiro com o Foco"
 
-#: lib/extension/indicator.js:94 lib/extension/window.js:67
+#: lib/extension/indicator.js:96 lib/extension/window.js:67
 msgid "Settings"
 msgstr "Configurações"
+
+#: lib/extension/indicator.js:139 lib/prefs/workspace.js:123
+#, fuzzy
+msgid "Reorganize Windows"
+msgstr "Janelas Flutuantes"
 
 #: lib/prefs/appearance.js:29
 #, fuzzy
@@ -268,87 +273,103 @@ msgid "Places new windows in a clock-wise fashion"
 msgstr "Rearranja janelas novas em modo horário"
 
 #: lib/prefs/settings.js:83
+msgid "Condense redundant containers"
+msgstr ""
+
+#: lib/prefs/settings.js:84
+msgid "Automatically flatten nested containers with same layout type"
+msgstr ""
+
+#: lib/prefs/settings.js:90
 #, fuzzy
 msgid "Stacked tiling"
 msgstr "Modo empilhado"
 
-#: lib/prefs/settings.js:84
+#: lib/prefs/settings.js:91
 #, fuzzy
 msgid "Stacks windows on top of each other while still tiling them"
 msgstr ""
 "Modo de Emparelhamento Empilhado (Empilhar janelas um em cima da outra mesmo "
 "ainda sendo emparelhadas)"
 
-#: lib/prefs/settings.js:90
+#: lib/prefs/settings.js:97
 #, fuzzy
 msgid "Tabbed tiling"
 msgstr "Modo em Abas"
 
-#: lib/prefs/settings.js:91
+#: lib/prefs/settings.js:98
 #, fuzzy
 msgid "Groups windows as tabs"
 msgstr "Modo de Emparelhamento em Abas (Agrupar janelas emparelhadas em abas)"
 
-#: lib/prefs/settings.js:97
+#: lib/prefs/settings.js:104
 #, fuzzy
 msgid "Auto exit tabbed tiling"
 msgstr "Modo em Abas"
 
-#: lib/prefs/settings.js:98
+#: lib/prefs/settings.js:105
 msgid "Exit tabbed tiling mode when only a single tab remains"
 msgstr "Sair do modo de abas quando restar apenas uma janela"
 
-#: lib/prefs/settings.js:104
+#: lib/prefs/settings.js:111
 #, fuzzy
 msgid "Drag-and-drop behavior"
 msgstr "Arranjo de Arrastar/Soltar Padrão"
 
-#: lib/prefs/settings.js:105
+#: lib/prefs/settings.js:112
 msgid "What to do when dragging one window on top of another"
 msgstr ""
 
-#: lib/prefs/settings.js:110
+#: lib/prefs/settings.js:117
 msgid "Swap"
 msgstr "Trocar"
 
-#: lib/prefs/settings.js:111
+#: lib/prefs/settings.js:118
 msgid "Tabbed"
 msgstr "Em Abas"
 
-#: lib/prefs/settings.js:112
+#: lib/prefs/settings.js:119
 msgid "Stacked"
 msgstr "Empilhado"
 
-#: lib/prefs/settings.js:116
+#: lib/prefs/settings.js:123
 msgid "Always on Top mode for floating windows"
 msgstr "Modo sempre no topo par janelas flutuantes"
 
-#: lib/prefs/settings.js:117
+#: lib/prefs/settings.js:124
 #, fuzzy
 msgid "Makes floating windows appear above tiled windows"
 msgstr ""
 "Modo Flutuante Sempre no Topo (Janelas flutuantes sempre acima de janelas "
 "emparelhadas)"
 
-#: lib/prefs/settings.js:125
+#: lib/prefs/settings.js:130
+msgid "Show reorganize button in panel"
+msgstr ""
+
+#: lib/prefs/settings.js:131
+msgid "Adds a button to the panel to reorganize windows by workspace rules"
+msgstr ""
+
+#: lib/prefs/settings.js:138
 msgid "Non-tiling workspaces"
 msgstr ""
 
-#: lib/prefs/settings.js:126
+#: lib/prefs/settings.js:139
 msgid ""
 "Disables tiling on specified workspaces. Starts from 0, separated by commas"
 msgstr ""
 
-#: lib/prefs/settings.js:129
+#: lib/prefs/settings.js:142
 msgid "Example: 0,1,2"
 msgstr "Examplo: 0,1,2"
 
-#: lib/prefs/settings.js:137
+#: lib/prefs/settings.js:150
 #, fuzzy
 msgid "Logger"
 msgstr "Nivel de Log"
 
-#: lib/prefs/settings.js:140
+#: lib/prefs/settings.js:153
 #, fuzzy
 msgid "Log level"
 msgstr "Nivel de Log"
@@ -375,15 +396,92 @@ msgstr ""
 msgid "Remove Item"
 msgstr "Remover Item"
 
+#: lib/prefs/workspace.js:25 lib/prefs/workspace.js:242
+#, fuzzy, javascript-format
+msgid "Workspace %d"
+msgstr "Área de Trabalho"
+
+#: lib/prefs/workspace.js:49
+msgid "Move up"
+msgstr ""
+
+#: lib/prefs/workspace.js:58
+msgid "Move down"
+msgstr ""
+
+#: lib/prefs/workspace.js:67
+#, fuzzy
+msgid "Remove"
+msgstr "Remover Item"
+
+#: lib/prefs/workspace.js:87
+msgid "Workspace"
+msgstr "Área de Trabalho"
+
+#: lib/prefs/workspace.js:96
+#, fuzzy
+msgid "Workspace Placement"
+msgstr "Área de Trabalho"
+
+#: lib/prefs/workspace.js:98
+msgid ""
+"Rules match windows by Class (required) and Title (optional). Use 'xprop "
+"WM_CLASS' (X11) or Looking Glass (Wayland) to find window class."
+msgstr ""
+
+#: lib/prefs/workspace.js:116
+msgid "Add Rule"
+msgstr ""
+
+#: lib/prefs/workspace.js:124
+msgid "Move all windows to their configured workspaces"
+msgstr ""
+
+#: lib/prefs/workspace.js:166
+#, fuzzy
+msgid "Edit Workspace Rule"
+msgstr "Área de Trabalho"
+
+#: lib/prefs/workspace.js:166
+#, fuzzy
+msgid "Add Workspace Rule"
+msgstr "Área de Trabalho"
+
+#: lib/prefs/workspace.js:180
+msgid "Window Class (e.g., firefox)"
+msgstr ""
+
+#: lib/prefs/workspace.js:187
+msgid "Window Title (optional)"
+msgstr ""
+
+#: lib/prefs/workspace.js:204
+#, fuzzy
+msgid "Workspace:"
+msgstr "Área de Trabalho"
+
+#: lib/prefs/workspace.js:215
+msgid "Cancel"
+msgstr ""
+
+#: lib/prefs/workspace.js:216
+msgid "Save"
+msgstr ""
+
+#: lib/prefs/workspace.js:216
+msgid "Add"
+msgstr ""
+
+#, fuzzy
+#~ msgid "Windows that will be placed in specific workspaces"
+#~ msgstr "Janelas que não serão rearranjadas"
+
 #, fuzzy
 #~ msgid "Add Window"
 #~ msgstr "Adicionar Janela"
 
 #~ msgid "Reset"
 #~ msgstr "Restaurar"
-
-#~ msgid "Workspace"
-#~ msgstr "Área de Trabalho"
 
 #~ msgid "Update Workspace Settings"
 #~ msgstr "Atualizar Configurações de Área de Trabalho"

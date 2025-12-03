@@ -27,7 +27,11 @@ import { ConfigManager } from "./lib/shared/settings.js";
 // Application imports
 import { Keybindings } from "./lib/extension/keybindings.js";
 import { WindowManager } from "./lib/extension/window.js";
-import { FeatureIndicator, FeatureMenuToggle } from "./lib/extension/indicator.js";
+import {
+  FeatureIndicator,
+  FeatureMenuToggle,
+  ReorganizeButton,
+} from "./lib/extension/indicator.js";
 import { ExtensionThemeManager } from "./lib/extension/extension-theme-manager.js";
 import { ForgeDBus } from "./lib/extension/dbus-interface.js";
 
@@ -97,11 +101,17 @@ export default class ForgeExtension extends Extension {
     this.indicator ??= new FeatureIndicator(this);
     this.indicator.quickSettingsItems.push(new FeatureMenuToggle(this));
     Main.panel.statusArea.quickSettings.addExternalIndicator(this.indicator);
+
+    this.reorganizeButton ??= new ReorganizeButton(this);
+    Main.panel.addToStatusArea("forge-reorganize", this.reorganizeButton, 0, "right");
   }
 
   _removeIndicator() {
     this.indicator?.quickSettingsItems.forEach((item) => item.destroy());
     this.indicator?.destroy();
     this.indicator = null;
+
+    this.reorganizeButton?.destroy();
+    this.reorganizeButton = null;
   }
 }

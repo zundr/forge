@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Forge\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-06 13:15-0300\n"
+"POT-Creation-Date: 2025-12-01 21:08-0800\n"
 "PO-Revision-Date: 2021-12-29 19:04+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -14,34 +14,38 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
 
-#: lib/extension/indicator.js:47 lib/prefs/settings.js:55
+#: lib/extension/indicator.js:49 lib/prefs/settings.js:55
 msgid "Tiling"
 msgstr ""
 
-#: lib/extension/indicator.js:66 lib/prefs/settings.js:24
+#: lib/extension/indicator.js:68 lib/prefs/settings.js:24
 msgid "Forge"
 msgstr ""
 
-#: lib/extension/indicator.js:66
+#: lib/extension/indicator.js:68
 msgid "Tiling Window Management"
 msgstr ""
 
-#: lib/extension/indicator.js:70
+#: lib/extension/indicator.js:72
 msgid "Gaps Hidden when Single"
 msgstr "Ruimtes verbergen bij één geopend venster"
 
-#: lib/extension/indicator.js:78
+#: lib/extension/indicator.js:80
 #, fuzzy
 msgid "Show Focus Hint Border"
 msgstr "Focushint bij zwevende vensters"
 
-#: lib/extension/indicator.js:86
+#: lib/extension/indicator.js:88
 msgid "Move Pointer with the Focus"
 msgstr ""
 
-#: lib/extension/indicator.js:94 lib/extension/window.js:67
+#: lib/extension/indicator.js:96 lib/extension/window.js:67
 msgid "Settings"
 msgstr "Voorkeuren"
+
+#: lib/extension/indicator.js:139 lib/prefs/workspace.js:123
+msgid "Reorganize Windows"
+msgstr ""
 
 #: lib/prefs/appearance.js:29
 #, fuzzy
@@ -263,82 +267,98 @@ msgid "Places new windows in a clock-wise fashion"
 msgstr ""
 
 #: lib/prefs/settings.js:83
+msgid "Condense redundant containers"
+msgstr ""
+
+#: lib/prefs/settings.js:84
+msgid "Automatically flatten nested containers with same layout type"
+msgstr ""
+
+#: lib/prefs/settings.js:90
 #, fuzzy
 msgid "Stacked tiling"
 msgstr "Gestapeld"
 
-#: lib/prefs/settings.js:84
+#: lib/prefs/settings.js:91
 #, fuzzy
 msgid "Stacks windows on top of each other while still tiling them"
 msgstr "Gestapelde tegelmodus (stapel vensters in de tegelmodus)"
 
-#: lib/prefs/settings.js:90
+#: lib/prefs/settings.js:97
 #, fuzzy
 msgid "Tabbed tiling"
 msgstr "Tabbladen"
 
-#: lib/prefs/settings.js:91
+#: lib/prefs/settings.js:98
 #, fuzzy
 msgid "Groups windows as tabs"
 msgstr "Tabblad-tegelmodus (groepeer getegelde vensters als tabbladen)"
 
-#: lib/prefs/settings.js:97
+#: lib/prefs/settings.js:104
 #, fuzzy
 msgid "Auto exit tabbed tiling"
 msgstr "Tabbladen"
 
-#: lib/prefs/settings.js:98
+#: lib/prefs/settings.js:105
 msgid "Exit tabbed tiling mode when only a single tab remains"
 msgstr ""
 
-#: lib/prefs/settings.js:104
+#: lib/prefs/settings.js:111
 #, fuzzy
 msgid "Drag-and-drop behavior"
 msgstr "Standaardindeling: gecentreerd slepen-en-neerzetten"
 
-#: lib/prefs/settings.js:105
+#: lib/prefs/settings.js:112
 msgid "What to do when dragging one window on top of another"
 msgstr ""
 
-#: lib/prefs/settings.js:110
+#: lib/prefs/settings.js:117
 msgid "Swap"
 msgstr ""
 
-#: lib/prefs/settings.js:111
+#: lib/prefs/settings.js:118
 msgid "Tabbed"
 msgstr "Tabbladen"
 
-#: lib/prefs/settings.js:112
+#: lib/prefs/settings.js:119
 msgid "Stacked"
 msgstr "Gestapeld"
 
-#: lib/prefs/settings.js:116
+#: lib/prefs/settings.js:123
 msgid "Always on Top mode for floating windows"
 msgstr ""
 
-#: lib/prefs/settings.js:117
+#: lib/prefs/settings.js:124
 msgid "Makes floating windows appear above tiled windows"
 msgstr ""
 
-#: lib/prefs/settings.js:125
+#: lib/prefs/settings.js:130
+msgid "Show reorganize button in panel"
+msgstr ""
+
+#: lib/prefs/settings.js:131
+msgid "Adds a button to the panel to reorganize windows by workspace rules"
+msgstr ""
+
+#: lib/prefs/settings.js:138
 msgid "Non-tiling workspaces"
 msgstr ""
 
-#: lib/prefs/settings.js:126
+#: lib/prefs/settings.js:139
 msgid ""
 "Disables tiling on specified workspaces. Starts from 0, separated by commas"
 msgstr ""
 
-#: lib/prefs/settings.js:129
+#: lib/prefs/settings.js:142
 msgid "Example: 0,1,2"
 msgstr ""
 
-#: lib/prefs/settings.js:137
+#: lib/prefs/settings.js:150
 #, fuzzy
 msgid "Logger"
 msgstr "Logniveau"
 
-#: lib/prefs/settings.js:140
+#: lib/prefs/settings.js:153
 #, fuzzy
 msgid "Log level"
 msgstr "Logniveau"
@@ -365,15 +385,87 @@ msgstr ""
 msgid "Remove Item"
 msgstr ""
 
+#: lib/prefs/workspace.js:25 lib/prefs/workspace.js:242
+#, fuzzy, javascript-format
+msgid "Workspace %d"
+msgstr "Werkblad"
+
+#: lib/prefs/workspace.js:49
+msgid "Move up"
+msgstr ""
+
+#: lib/prefs/workspace.js:58
+msgid "Move down"
+msgstr ""
+
+#: lib/prefs/workspace.js:67
+msgid "Remove"
+msgstr ""
+
+#: lib/prefs/workspace.js:87
+msgid "Workspace"
+msgstr "Werkblad"
+
+#: lib/prefs/workspace.js:96
+#, fuzzy
+msgid "Workspace Placement"
+msgstr "Werkblad"
+
+#: lib/prefs/workspace.js:98
+msgid ""
+"Rules match windows by Class (required) and Title (optional). Use 'xprop "
+"WM_CLASS' (X11) or Looking Glass (Wayland) to find window class."
+msgstr ""
+
+#: lib/prefs/workspace.js:116
+msgid "Add Rule"
+msgstr ""
+
+#: lib/prefs/workspace.js:124
+msgid "Move all windows to their configured workspaces"
+msgstr ""
+
+#: lib/prefs/workspace.js:166
+#, fuzzy
+msgid "Edit Workspace Rule"
+msgstr "Werkblad"
+
+#: lib/prefs/workspace.js:166
+#, fuzzy
+msgid "Add Workspace Rule"
+msgstr "Werkblad"
+
+#: lib/prefs/workspace.js:180
+msgid "Window Class (e.g., firefox)"
+msgstr ""
+
+#: lib/prefs/workspace.js:187
+msgid "Window Title (optional)"
+msgstr ""
+
+#: lib/prefs/workspace.js:204
+#, fuzzy
+msgid "Workspace:"
+msgstr "Werkblad"
+
+#: lib/prefs/workspace.js:215
+msgid "Cancel"
+msgstr ""
+
+#: lib/prefs/workspace.js:216
+msgid "Save"
+msgstr ""
+
+#: lib/prefs/workspace.js:216
+msgid "Add"
+msgstr ""
+
 #, fuzzy
 #~ msgid "Add Window"
 #~ msgstr "Venster"
 
 #~ msgid "Reset"
 #~ msgstr "Standaardwaarden"
-
-#~ msgid "Workspace"
-#~ msgstr "Werkblad"
 
 #~ msgid "Update Workspace Settings"
 #~ msgstr "Werkbladvoorkeuren bijwerken"

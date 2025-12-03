@@ -1,0 +1,406 @@
+#!/usr/bin/env gjs
+
+/**
+ * Forge Float Debug CLI
+ * Debug and manipulate window float status
+ */
+
+imports.gi.versions.Gtk = "4.0";
+const { Gio, GLib } = imports.gi;
+const System = imports.system;
+
+const HELP_TEXT = `
+Usage: forge-float-debug <command> [options]
+
+Commands:
+  list                List all windows with their float status
+  overrides           Show float overrides configuration
+  toggle <window-id>  Toggle float status for a window
+  set <window-id> <mode>  Set window mode (FLOAT, TILE, GRAB_TILE, DEFAULT)
+  watch               Watch window mode changes in real-time
+
+Options:
+  -h, --help          Show this help message
+  -v, --verbose       Show detailed information
+
+Examples:
+  forge-float-debug list                    # List all windows
+  forge-float-debug overrides               # Show float overrides
+  forge-float-debug toggle 12345            # Toggle float for window 12345
+  forge-float-debug set 12345 TILE          # Force window to TILE mode
+  forge-float-debug watch                   # Watch mode changes
+`;
+
+/**
+ * Get D-Bus proxy for Forge extension
+ */
+function getForgeProxy() {
+  try {
+    return Gio.DBusProxy.new_for_bus_sync(
+      Gio.BusType.SESSION,
+      Gio.DBusProxyFlags.NONE,
+      null,
+      "org.gnome.Shell",
+      "/org/gnome/Shell/Extensions/Forge",
+      "org.gnome.Shell.Extensions.Forge",
+      null
+    );
+  } catch (e) {
+    printerr("Error: Cannot connect to Forge extension D-Bus interface");
+    printerr("Make sure Forge extension is running");
+    return null;
+  }
+}
+
+/**
+ * Get tree from extension
+ */
+function getTree(proxy) {
+  try {
+    const result = proxy.call_sync("GetTree", null, Gio.DBusCallFlags.NONE, -1, null);
+    if (result) {
+      const [treeJson] = result.deep_unpack();
+      return JSON.parse(treeJson);
+    }
+  } catch (e) {
+    printerr(`Error getting tree: ${e.message}`);
+  }
+  return null;
+}
+
+/**
+ * Get float overrides
+ */
+function getFloatOverrides(proxy) {
+  try {
+    const result = proxy.call_sync("GetFloatOverrides", null, Gio.DBusCallFlags.NONE, -1, null);
+    if (result) {
+      const [overridesJson] = result.deep_unpack();
+      return JSON.parse(overridesJson);
+    }
+  } catch (e) {
+    printerr(`Error getting overrides: ${e.message}`);
+  }
+  return null;
+}
+
+/**
+ * Set window mode
+ */
+function setWindowMode(proxy, windowId, mode) {
+  try {
+    const result = proxy.call_sync(
+      "SetWindowMode",
+      new GLib.Variant("(us)", [windowId, mode]),
+      Gio.DBusCallFlags.NONE,
+      -1,
+      null
+    );
+    if (result) {
+      const [resultJson] = result.deep_unpack();
+      return JSON.parse(resultJson);
+    }
+  } catch (e) {
+    printerr(`Error setting window mode: ${e.message}`);
+  }
+  return null;
+}
+
+/**
+ * Toggle window float
+ */
+function toggleWindowFloat(proxy, windowId) {
+  try {
+    const result = proxy.call_sync(
+      "ToggleWindowFloat",
+      new GLib.Variant("(u)", [windowId]),
+      Gio.DBusCallFlags.NONE,
+      -1,
+      null
+    );
+    if (result) {
+      const [resultJson] = result.deep_unpack();
+      return JSON.parse(resultJson);
+    }
+  } catch (e) {
+    printerr(`Error toggling float: ${e.message}`);
+  }
+  return null;
+}
+
+/**
+ * Extract all windows from tree
+ */
+function extractWindows(node, windows = []) {
+  if (node.nodeType === "WINDOW") {
+    windows.push(node);
+  }
+
+  if (node.childNodes && node.childNodes.length > 0) {
+    node.childNodes.forEach((child) => extractWindows(child, windows));
+  }
+
+  return windows;
+}
+
+/**
+ * Command: list
+ */
+function cmdList(proxy, options) {
+  const tree = getTree(proxy);
+  if (!tree) {
+    return 1;
+  }
+
+  const windows = extractWindows(tree);
+
+  print("\n╔═══════════════════════════════════════════════════════════════════════════╗");
+  print("║                           FORGE WINDOW LIST                               ║");
+  print("╚═══════════════════════════════════════════════════════════════════════════╝\n");
+
+  if (windows.length === 0) {
+    print("No windows found.\n");
+    return 0;
+  }
+
+  windows.forEach((window) => {
+    const meta = window.nodeValue;
+    const mode = window.mode;
+    const isFloating = mode === "FLOAT";
+    const indicator = isFloating ? "🎈 FLOAT" : "🔲 TILE  ";
+
+    print(`${indicator}  ID: ${meta.id.toString().padEnd(8)} ${meta.wmClass}`);
+    print(`           "${meta.title}"`);
+
+    if (options.verbose) {
+      print(
+        `           Type: ${meta.windowType}, Resize: ${meta.allowsResize}, Transient: ${meta.transientFor}`
+      );
+      if (window.rect) {
+        const r = window.rect;
+        print(`           Rect: ${r.width}x${r.height}+${r.x}+${r.y}`);
+      }
+    }
+
+    print("");
+  });
+
+  print(`Total: ${windows.length} windows\n`);
+  return 0;
+}
+
+/**
+ * Command: overrides
+ */
+function cmdOverrides(proxy, options) {
+  const data = getFloatOverrides(proxy);
+  if (!data) {
+    return 1;
+  }
+
+  print("\n╔═══════════════════════════════════════════════════════════════════════════╗");
+  print("║                        FLOAT OVERRIDES CONFIG                             ║");
+  print("╚═══════════════════════════════════════════════════════════════════════════╝\n");
+
+  if (data.overrides.length === 0) {
+    print("No float overrides configured.\n");
+    return 0;
+  }
+
+  data.overrides.forEach((override, index) => {
+    print(`[${index + 1}] ${override.wmClass || "(no class)"}`);
+    if (override.wmTitle) {
+      print(`    Title: ${override.wmTitle}`);
+    }
+    if (override.wmId) {
+      print(`    Window ID: ${override.wmId}`);
+    }
+    print("");
+  });
+
+  print(`Total: ${data.overrides.length} overrides\n`);
+  return 0;
+}
+
+/**
+ * Command: toggle
+ */
+function cmdToggle(proxy, windowId, options) {
+  const id = parseInt(windowId);
+  if (isNaN(id)) {
+    printerr(`Error: Invalid window ID: ${windowId}`);
+    return 1;
+  }
+
+  print(`\nToggling float for window ${id}...\n`);
+
+  const result = toggleWindowFloat(proxy, id);
+  if (!result) {
+    return 1;
+  }
+
+  if (result.error) {
+    printerr(`Error: ${result.error}`);
+    return 1;
+  }
+
+  print(`✓ Success!`);
+  print(`  Window: ${result.wmClass} - "${result.title}"`);
+  print(`  New mode: ${result.newMode}`);
+  print(`  Is floating exempt: ${result.isFloatingExempt}`);
+  print("");
+
+  return 0;
+}
+
+/**
+ * Command: set
+ */
+function cmdSet(proxy, windowId, mode, options) {
+  const id = parseInt(windowId);
+  if (isNaN(id)) {
+    printerr(`Error: Invalid window ID: ${windowId}`);
+    return 1;
+  }
+
+  const validModes = ["FLOAT", "TILE", "GRAB_TILE", "DEFAULT"];
+  if (!validModes.includes(mode)) {
+    printerr(`Error: Invalid mode: ${mode}`);
+    printerr(`Valid modes: ${validModes.join(", ")}`);
+    return 1;
+  }
+
+  print(`\nSetting window ${id} to ${mode}...\n`);
+
+  const result = setWindowMode(proxy, id, mode);
+  if (!result) {
+    return 1;
+  }
+
+  if (result.error) {
+    printerr(`Error: ${result.error}`);
+    return 1;
+  }
+
+  print(`✓ Success!`);
+  print(`  Window: ${result.wmClass} - "${result.title}"`);
+  print(`  Old mode: ${result.oldMode}`);
+  print(`  New mode: ${result.newMode}`);
+  print("");
+
+  return 0;
+}
+
+/**
+ * Command: watch
+ */
+function cmdWatch(proxy, options) {
+  print("\n╔═══════════════════════════════════════════════════════════════════════════╗");
+  print("║                      WATCHING WINDOW MODE CHANGES                         ║");
+  print("║                         Press Ctrl+C to stop                              ║");
+  print("╚═══════════════════════════════════════════════════════════════════════════╝\n");
+
+  let previousState = {};
+
+  const loop = GLib.MainLoop.new(null, false);
+
+  // Poll every 500ms
+  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
+    const tree = getTree(proxy);
+    if (!tree) {
+      return true; // Continue polling
+    }
+
+    const windows = extractWindows(tree);
+    const currentState = {};
+
+    windows.forEach((window) => {
+      const meta = window.nodeValue;
+      const id = meta.id;
+      currentState[id] = {
+        mode: window.mode,
+        wmClass: meta.wmClass,
+        title: meta.title,
+      };
+
+      // Check for changes
+      if (previousState[id]) {
+        if (previousState[id].mode !== window.mode) {
+          const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
+          const oldMode = previousState[id].mode;
+          const newMode = window.mode;
+          const indicator = newMode === "FLOAT" ? "🎈" : "🔲";
+
+          print(`[${timestamp}] ${indicator} ${meta.wmClass} (${id})`);
+          print(`           ${oldMode} → ${newMode}`);
+          print(`           "${meta.title}"`);
+          print("");
+        }
+      }
+    });
+
+    previousState = currentState;
+    return true; // Continue polling
+  });
+
+  loop.run();
+  return 0;
+}
+
+/**
+ * Main entry point
+ */
+function main(argv) {
+  if (argv.length === 0 || argv[0] === "-h" || argv[0] === "--help") {
+    print(HELP_TEXT);
+    return 0;
+  }
+
+  const command = argv[0];
+  const options = {
+    verbose: argv.includes("-v") || argv.includes("--verbose"),
+  };
+
+  // Get proxy
+  const proxy = getForgeProxy();
+  if (!proxy) {
+    return 1;
+  }
+
+  // Execute command
+  switch (command) {
+    case "list":
+      return cmdList(proxy, options);
+
+    case "overrides":
+      return cmdOverrides(proxy, options);
+
+    case "toggle":
+      if (argv.length < 2) {
+        printerr("Error: Missing window ID");
+        printerr("Usage: forge-float-debug toggle <window-id>");
+        return 1;
+      }
+      return cmdToggle(proxy, argv[1], options);
+
+    case "set":
+      if (argv.length < 3) {
+        printerr("Error: Missing window ID or mode");
+        printerr("Usage: forge-float-debug set <window-id> <mode>");
+        return 1;
+      }
+      return cmdSet(proxy, argv[1], argv[2], options);
+
+    case "watch":
+      return cmdWatch(proxy, options);
+
+    default:
+      printerr(`Error: Unknown command: ${command}`);
+      printerr(HELP_TEXT);
+      return 1;
+  }
+}
+
+// Run main function
+const exitCode = main(ARGV);
+System.exit(exitCode);

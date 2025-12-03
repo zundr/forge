@@ -56,8 +56,19 @@ function formatAttributes(node, options = {}) {
     parts.push(`title:"${title}"`);
     parts.push(`id:${id}`);
 
-    if (options.mode || options.verbose) {
-      parts.push(`mode:${node.mode}`);
+    // Always show float status with visual indicator
+    const isFloating = node.mode === "FLOAT";
+    const floatIndicator = isFloating ? "🎈" : "🔲";
+    parts.push(`${floatIndicator} ${node.mode}`);
+
+    // Show why window might be floating in verbose mode
+    if (options.verbose && isFloating) {
+      const wt = metaWindow.windowType;
+      const ar = metaWindow.allowsResize;
+      const tf = metaWindow.transientFor;
+      if (wt !== undefined) parts.push(`wt:${wt}`);
+      if (ar !== undefined) parts.push(`resize:${ar}`);
+      if (tf !== undefined) parts.push(`transient:${tf}`);
     }
 
     if ((options.rect || options.verbose) && node.rect) {
@@ -88,7 +99,18 @@ function formatNode(node, depth, isLast, isLastArray, options = {}) {
 
   let line = prefix + nodeType;
 
-  if (nodeType === "WORKSPACE" || nodeType === "MONITOR") {
+  if (nodeType === "WORKSPACE") {
+    // Handle both serialized (object) and string workspace values
+    if (typeof nodeValue === "object" && nodeValue.id) {
+      const wsNumber = nodeValue.index + 1; // Convert to 1-based
+      const wsName = nodeValue.name || "";
+      line += ` ${wsNumber}:${wsName}`;
+    } else {
+      // Fallback for string format (e.g., "ws0")
+      const wsNumber = parseInt(nodeValue.replace("ws", "")) + 1;
+      line += ` ${wsNumber}`;
+    }
+  } else if (nodeType === "MONITOR") {
     line += " " + nodeValue;
   }
 
@@ -127,17 +149,21 @@ Usage: forge-tree-dump [OPTIONS]
 
 Dump the Forge window tree structure with Unicode box-drawing characters.
 
+Float Status Indicators:
+  🎈 FLOAT       Window is floating (not tiled)
+  🔲 TILE        Window is tiled
+  🔲 GRAB_TILE   Window is being dragged
+  🔲 DEFAULT     Window mode not set
+
 Options:
-  -v, --verbose     Show all attributes (mode, rect, layout)
+  -v, --verbose     Show all attributes (rect, layout)
   -r, --rect        Show rectangle dimensions
-  -m, --mode        Show window modes
-  -l, --layout      Show container layouts
   -h, --help        Show this help message
 
 Examples:
-  forge-tree-dump                 # Basic tree output
+  forge-tree-dump                 # Basic tree output with float status
   forge-tree-dump --verbose       # Show all attributes
-  forge-tree-dump --rect --mode   # Show rectangles and modes
+  forge-tree-dump --rect          # Show rectangles
 `;
 
 /**

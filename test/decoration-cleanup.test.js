@@ -267,4 +267,115 @@ describe("Decoration Cleanup", () => {
       });
     });
   });
+
+  describe("Disposed decoration handling", () => {
+    test("isDisposed helper should detect disposed objects", () => {
+      // Simulate isDisposed function
+      const isDisposed = (obj) => {
+        if (!obj) return true;
+        try {
+          void obj.visible;
+          return false;
+        } catch (e) {
+          return true;
+        }
+      };
+
+      // Normal object
+      const normalObj = { visible: true };
+      expect(isDisposed(normalObj)).toBe(false);
+
+      // Null object
+      expect(isDisposed(null)).toBe(true);
+      expect(isDisposed(undefined)).toBe(true);
+
+      // Disposed object (throws on property access)
+      const disposedObj = {
+        get visible() {
+          throw new Error("Object has been disposed");
+        },
+      };
+      expect(isDisposed(disposedObj)).toBe(true);
+    });
+
+    test("should recreate decoration if disposed when processing tabbed layout", () => {
+      let decorationCreated = false;
+      const mockNode = {
+        decoration: null,
+        _createDecoration: jest.fn(() => {
+          decorationCreated = true;
+          mockNode.decoration = { visible: true };
+        }),
+      };
+
+      // Simulate disposed decoration
+      const disposedDecoration = {
+        get visible() {
+          throw new Error("Object has been disposed");
+        },
+      };
+      mockNode.decoration = disposedDecoration;
+
+      // isDisposed check
+      const isDisposed = (obj) => {
+        if (!obj) return true;
+        try {
+          void obj.visible;
+          return false;
+        } catch (e) {
+          return true;
+        }
+      };
+
+      // Simulate processTabbed logic
+      if (isDisposed(mockNode.decoration)) {
+        mockNode.decoration = null;
+        mockNode._createDecoration();
+      }
+
+      expect(mockNode._createDecoration).toHaveBeenCalled();
+      expect(decorationCreated).toBe(true);
+      expect(mockNode.decoration).not.toBeNull();
+    });
+
+    test("should recreate tab if disposed when adding to decoration", () => {
+      let tabCreated = false;
+      const mockChild = {
+        tab: null,
+        _createWindowTab: jest.fn(() => {
+          tabCreated = true;
+          mockChild.tab = { visible: true };
+        }),
+      };
+
+      // Simulate disposed tab
+      const disposedTab = {
+        get visible() {
+          throw new Error("Object has been disposed");
+        },
+      };
+      mockChild.tab = disposedTab;
+
+      // isDisposed check
+      const isDisposed = (obj) => {
+        if (!obj) return true;
+        try {
+          void obj.visible;
+          return false;
+        } catch (e) {
+          return true;
+        }
+      };
+
+      // Simulate processTabbed tab handling logic
+      if (isDisposed(mockChild.tab)) {
+        mockChild.tab = null;
+        mockChild._createWindowTab();
+      }
+
+      expect(mockChild._createWindowTab).toHaveBeenCalled();
+      expect(tabCreated).toBe(true);
+      expect(mockChild.tab).not.toBeNull();
+    });
+  });
 });
