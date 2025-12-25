@@ -90,6 +90,29 @@ For any shortcut conflicts, the user has to manually configure those for now fro
 - Window Overrides: `$HOME/.config/forge/config/windows.json`
 - Stylesheet Overrides: `$HOME/.config/forge/stylesheet/forge/stylesheet.css`
 
+## Documentation
+
+Comprehensive documentation organized by topic. Start here for quick reference, dive deeper as needed.
+
+### Architecture & Design
+- [Architecture Overview](docs/architecture.md) - System design, component interaction, and data flow
+- [Tree System](docs/tree-system.md) - Node types, layouts, and tiling algorithms
+- [Window Management](docs/window-management.md) - Window lifecycle, modes, and rendering pipeline
+
+### Development & Debugging
+- [Development Guide](docs/development.md) - Build, test, and debug workflows
+- [Debugging GNOME Crashes](docs/debugging-gnome-crashes.md) - Systematic crash investigation and root cause analysis
+- [Testing GNOME Extensions](docs/howto-test-gnome-extensions.md) - Testing strategies for X11 and Wayland
+- [Listing Windows on Wayland](docs/howto-list-windows-wayland.md) - Wayland-specific window inspection
+
+### Customization
+- [Configuration](docs/configuration.md) - Settings, overrides, and workspace rules
+- [Theming](docs/theming.md) - CSS system and dynamic styling
+- [Keybindings](docs/keybindings.md) - Command system and keyboard shortcuts
+
+### Integration
+- [D-Bus API](docs/dbus-api.md) - External tool integration and CLI utilities
+
 ## GNOME Defaults
 
 GNOME Shell has built in support for workspace management and seems to work well - so Forge will not touch those.

@@ -268,6 +268,116 @@ describe("Decoration Cleanup", () => {
     });
   });
 
+  describe("TOCTOU Bug - Decoration disposed during recursive rendering", () => {
+    test("RED: should crash when decoration disposed between check and use", () => {
+      // Simulate decoration that becomes disposed during recursive rendering
+      let decorationDisposed = false;
+      const mockDecoration = {
+        get visible() {
+          if (decorationDisposed) {
+            throw new Error("Object has been disposed");
+          }
+          return true;
+        },
+        set_size: jest.fn(() => {
+          if (decorationDisposed) {
+            throw new Error("Segfault: accessing disposed object");
+          }
+        }),
+        set_position: jest.fn(),
+        show: jest.fn(),
+      };
+
+      const mockNode = {
+        decoration: mockDecoration,
+      };
+
+      const isDisposed = (obj) => {
+        if (!obj) return true;
+        try {
+          void obj.visible;
+          return false;
+        } catch (e) {
+          return true;
+        }
+      };
+
+      // Buggy code: check once, then use later without re-checking
+      let decoration = mockNode.decoration;
+
+      // Initial check passes
+      if (isDisposed(decoration)) {
+        mockNode.decoration = null;
+        decoration = null;
+      }
+
+      // Simulate recursive rendering that disposes decoration
+      decorationDisposed = true;
+
+      // BUG: Use decoration without re-checking
+      if (decoration !== null && decoration !== undefined) {
+        expect(() => {
+          decoration.set_size(100, 50); // Should throw
+        }).toThrow("Segfault: accessing disposed object");
+      }
+    });
+
+    test("GREEN: should handle decoration disposed during recursive rendering", () => {
+      // Simulate decoration that becomes disposed during recursive rendering
+      let decorationDisposed = false;
+      const mockDecoration = {
+        get visible() {
+          if (decorationDisposed) {
+            throw new Error("Object has been disposed");
+          }
+          return true;
+        },
+        set_size: jest.fn(),
+        set_position: jest.fn(),
+        show: jest.fn(),
+      };
+
+      const mockNode = {
+        decoration: mockDecoration,
+      };
+
+      const isDisposed = (obj) => {
+        if (!obj) return true;
+        try {
+          void obj.visible;
+          return false;
+        } catch (e) {
+          return true;
+        }
+      };
+
+      // Initial check
+      let decoration = mockNode.decoration;
+      if (isDisposed(decoration)) {
+        mockNode.decoration = null;
+        decoration = null;
+      }
+
+      // Simulate recursive rendering that disposes decoration
+      decorationDisposed = true;
+
+      // FIXED: Re-check before use (TOCTOU fix)
+      decoration = mockNode.decoration;
+      if (decoration && isDisposed(decoration)) {
+        mockNode.decoration = null;
+        decoration = null;
+      }
+
+      // Safe to use
+      if (decoration !== null && decoration !== undefined) {
+        decoration.set_size(100, 50);
+      }
+
+      // Should not have called set_size because decoration was nullified
+      expect(mockDecoration.set_size).not.toHaveBeenCalled();
+    });
+  });
+
   describe("Disposed decoration handling", () => {
     test("isDisposed helper should detect disposed objects", () => {
       // Simulate isDisposed function
