@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Forge\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-01 21:08-0800\n"
+"POT-Creation-Date: 2026-02-14 11:43-0800\n"
 "PO-Revision-Date: 2021-09-18 16:25-0400\n"
 "Last-Translator: Jose Maranan <jmmaranan@gmail.com>\n"
 "Language-Team: \n"
@@ -304,69 +304,78 @@ msgstr "Agrupa las ventanas en mosaico como pestañas"
 
 #: lib/prefs/settings.js:104
 #, fuzzy
+msgid "Group top-level windows in tabbed mode"
+msgstr "Agrupa las ventanas en mosaico como pestañas"
+
+#: lib/prefs/settings.js:105
+msgid "When toggling tabbed mode, group all top-level sibling windows together"
+msgstr ""
+
+#: lib/prefs/settings.js:110
+#, fuzzy
 msgid "Auto exit tabbed tiling"
 msgstr "Salir automáticamente del modo de mosaico en pestañas"
 
-#: lib/prefs/settings.js:105
+#: lib/prefs/settings.js:111
 msgid "Exit tabbed tiling mode when only a single tab remains"
 msgstr "Salir del modo de mosaico en pestañas cuando solo queda una pestaña"
 
-#: lib/prefs/settings.js:111
+#: lib/prefs/settings.js:117
 #, fuzzy
 msgid "Drag-and-drop behavior"
 msgstr "Distribución central predeterminada de arrastrar y soltar"
 
-#: lib/prefs/settings.js:112
+#: lib/prefs/settings.js:118
 msgid "What to do when dragging one window on top of another"
 msgstr ""
 
-#: lib/prefs/settings.js:117
+#: lib/prefs/settings.js:123
 msgid "Swap"
 msgstr "Intercambiar"
 
-#: lib/prefs/settings.js:118
+#: lib/prefs/settings.js:124
 msgid "Tabbed"
 msgstr "En pestañas"
 
-#: lib/prefs/settings.js:119
+#: lib/prefs/settings.js:125
 msgid "Stacked"
 msgstr "Apilado"
 
-#: lib/prefs/settings.js:123
+#: lib/prefs/settings.js:129
 msgid "Always on Top mode for floating windows"
 msgstr ""
 
-#: lib/prefs/settings.js:124
+#: lib/prefs/settings.js:130
 #, fuzzy
 msgid "Makes floating windows appear above tiled windows"
 msgstr "Ventanas flotantes siempre encima de las ventanas en mosaico"
 
-#: lib/prefs/settings.js:130
+#: lib/prefs/settings.js:136
 msgid "Show reorganize button in panel"
 msgstr ""
 
-#: lib/prefs/settings.js:131
+#: lib/prefs/settings.js:137
 msgid "Adds a button to the panel to reorganize windows by workspace rules"
 msgstr ""
 
-#: lib/prefs/settings.js:138
+#: lib/prefs/settings.js:144
 msgid "Non-tiling workspaces"
 msgstr ""
 
-#: lib/prefs/settings.js:139
+#: lib/prefs/settings.js:145
 msgid ""
 "Disables tiling on specified workspaces. Starts from 0, separated by commas"
 msgstr ""
 
-#: lib/prefs/settings.js:142
+#: lib/prefs/settings.js:148
 msgid "Example: 0,1,2"
 msgstr ""
 
-#: lib/prefs/settings.js:150
+#: lib/prefs/settings.js:156
 msgid "Logger"
 msgstr "Registro"
 
-#: lib/prefs/settings.js:153
+#: lib/prefs/settings.js:159
 #, fuzzy
 msgid "Log level"
 msgstr "Nivel de registro"

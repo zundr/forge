@@ -83,6 +83,16 @@
             <summary>Tabbed tiling mode on/off</summary>
         </key>
 
+        <key type="b" name="tabbed-tiling-mode-group-top-level">
+            <default>true</default>
+            <summary>Group all top-level windows when enabling tabbed mode</summary>
+            <description>
+                When enabled, toggling tabbed mode on a top-level window will group
+                all sibling windows at the same level into a tabbed container.
+                When disabled, only the focused window is affected.
+            </description>
+        </key>
+
         <!-- Development Settings -->
         <key type="u" name="log-level">
             <default>0</default>
