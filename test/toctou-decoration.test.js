@@ -150,6 +150,135 @@ describe("TOCTOU Decoration Disposal", () => {
     });
   });
 
+  describe("native segfault prevention: isDisposed guard before contains/add_child", () => {
+    /**
+     * Simulates the REAL crash scenario: decoration is valid for set_size/show
+     * but becomes disposed before contains/add_child. In production, contains()
+     * on a disposed St.BoxLayout triggers a native segfault that try-catch
+     * CANNOT catch. The fix must use isDisposed() to prevent the call entirely.
+     */
+    function createDecorationDisposedAfterShow() {
+      let disposed = false;
+      return {
+        set_size: jest.fn(),
+        set_position: jest.fn(),
+        show: jest.fn(() => {
+          disposed = true;
+        }), // disposal happens during show
+        hide: jest.fn(() => {
+          disposed = true;
+        }),
+        // These simulate native calls that would segfault if disposed
+        contains: jest.fn(() => {
+          throw new Error("NATIVE SEGFAULT");
+        }),
+        add_child: jest.fn(() => {
+          throw new Error("NATIVE SEGFAULT");
+        }),
+        get visible() {
+          if (disposed) throw new Error("Object St.BoxLayout has been already disposed");
+          return true;
+        },
+      };
+    }
+
+    /**
+     * Fixed version that guards contains/add_child with isDisposed() check.
+     * This prevents the native segfault by never calling contains/add_child
+     * on a disposed object.
+     */
+    function applyDecorationOpsFixed(
+      node,
+      adjustWidth,
+      stackedHeight,
+      adjustX,
+      adjustY,
+      showDecoration,
+      child
+    ) {
+      if (!node.decoration) return;
+
+      function isDisposed(obj) {
+        if (!obj) return true;
+        try {
+          void obj.visible;
+          return false;
+        } catch (e) {
+          return true;
+        }
+      }
+
+      try {
+        node.decoration.set_size(adjustWidth, stackedHeight);
+        node.decoration.set_position(adjustX, adjustY);
+
+        if (showDecoration) {
+          node.decoration.show();
+        } else {
+          node.decoration.hide();
+        }
+
+        if (child?.tab) {
+          // Guard against native segfault: check isDisposed before contains/add_child
+          if (isDisposed(node.decoration)) {
+            node.decoration = null;
+          } else {
+            try {
+              if (!node.decoration.contains(child.tab)) {
+                node.decoration.add_child(child.tab);
+              }
+            } catch (tabError) {
+              child.tab = null;
+            }
+          }
+        }
+      } catch (e) {
+        node.decoration = null;
+      }
+    }
+
+    test("decoration disposed after show: contains/add_child never called", () => {
+      const decoration = createDecorationDisposedAfterShow();
+      const node = { decoration };
+      const child = { tab: { label: "test" } };
+
+      expect(() => {
+        applyDecorationOpsFixed(node, 100, 30, 0, 0, true, child);
+      }).not.toThrow();
+
+      // contains/add_child must NOT be called — they would segfault
+      expect(decoration.contains).not.toHaveBeenCalled();
+      expect(decoration.add_child).not.toHaveBeenCalled();
+      // decoration reference cleared
+      expect(node.decoration).toBeNull();
+    });
+
+    test("decoration disposed after hide: contains/add_child never called", () => {
+      const decoration = createDecorationDisposedAfterShow();
+      const node = { decoration };
+      const child = { tab: { label: "test" } };
+
+      expect(() => {
+        applyDecorationOpsFixed(node, 100, 30, 0, 0, false, child);
+      }).not.toThrow();
+
+      expect(decoration.contains).not.toHaveBeenCalled();
+      expect(decoration.add_child).not.toHaveBeenCalled();
+      expect(node.decoration).toBeNull();
+    });
+
+    test("live decoration: contains/add_child still work normally", () => {
+      const decoration = createLiveDecoration();
+      const node = { decoration };
+      const child = { tab: { label: "test" } };
+
+      applyDecorationOpsFixed(node, 100, 30, 0, 0, true, child);
+
+      expect(decoration.contains).toHaveBeenCalledWith(child.tab);
+      expect(decoration.add_child).toHaveBeenCalledWith(child.tab);
+    });
+  });
+
   describe("isDisposed() function", () => {
     function isDisposed(obj) {
       if (!obj) return true;
