@@ -307,3 +307,125 @@ describe("TOCTOU Decoration Disposal", () => {
     });
   });
 });
+
+/**
+ * Phase 2 Tests: processTabbed fix using JS-side parent tracking
+ * to eliminate native .contains() calls entirely.
+ */
+const { isDisposed, safeCall, trackParent, isChildOf } = require("../lib/extension/safe-widget");
+
+describe("processTabbed TOCTOU fix — JS-side parent tracking", () => {
+  function createLiveDecoration() {
+    const children = [];
+    return {
+      visible: true,
+      set_size: jest.fn(),
+      set_position: jest.fn(),
+      show: jest.fn(),
+      hide: jest.fn(),
+      contains: jest.fn((c) => children.includes(c)),
+      add_child: jest.fn((c) => children.push(c)),
+      remove_child: jest.fn(),
+      destroy: jest.fn(),
+    };
+  }
+
+  /**
+   * Simulates the FIXED processTabbed decoration block.
+   * Uses trackParent/isChildOf instead of native .contains().
+   */
+  function processTabDecoration(node, child, showDecoration) {
+    if (!node.decoration) return;
+
+    try {
+      node.decoration.set_size(100, 30);
+      node.decoration.set_position(0, 0);
+
+      if (showDecoration) {
+        node.decoration.show();
+      } else {
+        node.decoration.hide();
+      }
+
+      if (child.tab) {
+        // JS-side check — no native .contains() call
+        if (!isChildOf(child.tab, node.decoration)) {
+          try {
+            node.decoration.add_child(child.tab);
+            trackParent(child.tab, node.decoration);
+          } catch (e) {
+            child.tab = null;
+          }
+        }
+      }
+    } catch (e) {
+      node.decoration = null;
+    }
+  }
+
+  test("tab added and tracked on first render", () => {
+    const decoration = createLiveDecoration();
+    const node = { decoration };
+    const tab = { label: "test" };
+    const child = { tab };
+
+    processTabDecoration(node, child, true);
+
+    expect(decoration.add_child).toHaveBeenCalledWith(tab);
+    expect(decoration.contains).not.toHaveBeenCalled(); // no native .contains()!
+    expect(isChildOf(tab, decoration)).toBe(true);
+  });
+
+  test("tab NOT re-added on subsequent renders (tracked)", () => {
+    const decoration = createLiveDecoration();
+    const node = { decoration };
+    const tab = { label: "test" };
+    const child = { tab };
+
+    processTabDecoration(node, child, true); // first render
+    decoration.add_child.mockClear();
+    processTabDecoration(node, child, true); // second render
+
+    expect(decoration.add_child).not.toHaveBeenCalled();
+    expect(decoration.contains).not.toHaveBeenCalled();
+  });
+
+  test("disposed decoration during set_size: no crash, ref nulled", () => {
+    const disposed = new Proxy(
+      {},
+      {
+        get() {
+          throw new Error("Object St.BoxLayout has been already disposed");
+        },
+      }
+    );
+    const node = { decoration: disposed };
+    const child = { tab: { label: "test" } };
+
+    expect(() => processTabDecoration(node, child, true)).not.toThrow();
+    expect(node.decoration).toBeNull();
+  });
+
+  test("disposed decoration during add_child: tab nulled, no crash", () => {
+    const decoration = createLiveDecoration();
+    decoration.add_child = jest.fn(() => {
+      throw new Error("Object St.BoxLayout has been already disposed");
+    });
+    const node = { decoration };
+    const child = { tab: { label: "test" } };
+
+    expect(() => processTabDecoration(node, child, true)).not.toThrow();
+    expect(child.tab).toBeNull();
+  });
+
+  test("no tab: decoration ops still work", () => {
+    const decoration = createLiveDecoration();
+    const node = { decoration };
+    const child = { tab: null };
+
+    processTabDecoration(node, child, true);
+
+    expect(decoration.show).toHaveBeenCalled();
+    expect(decoration.add_child).not.toHaveBeenCalled();
+  });
+});

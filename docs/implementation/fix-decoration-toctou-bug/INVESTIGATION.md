@@ -2,8 +2,8 @@
 
 **Date:** 2026-02-14  
 **Investigator:** joseaps  
-**Status:** Root causes confirmed, fixes pending  
-**Last Updated:** 2026-02-14 10:10 — Toggle-float flicker bug root cause found
+**Status:** Comprehensive fix plan created  
+**Last Updated:** 2026-03-10 14:50 — Full TOCTOU audit complete, 7-phase fix plan
 
 ---
 
@@ -286,3 +286,63 @@ GNOME Shell logs show load warnings. Risk of loading wrong version or double sig
 | `lib/extension/dbus-interface.js:147-162` | `_serializeNodeValue()` | D-Bus window properties |
 | `~/.config/forge/config/windows.json` | User config | Persisted float overrides |
 | `config/windows.json` | Repo default | Default float overrides template |
+
+---
+
+## Comprehensive TOCTOU Fix Plan (2026-03-10)
+
+### Second Crash — 2026-03-10 14:13:48
+
+Same bug as Feb 14. Monitor manager assertion failures at 14:13:37 (display config change) → decoration widgets disposed → tree render at 14:13:48 hit disposed `St.BoxLayout` at tree.js:1708 (`.contains()` on disposed object) → Wayland socket broke same second → Xwayland crash → system reboot.
+
+### Full Audit Results
+
+**~35 TOCTOU-vulnerable locations** found across 3 files:
+
+| File | Vulnerable Locations | Critical | High | Medium |
+|------|---------------------|----------|------|--------|
+| tree.js | 10 | 2 (lines 1688, 1700-1714) | 3 | 5 |
+| window.js | 24 | 1 (showWindowBorders) | 6 | 17 |
+| utils.js | 1 | 0 | 0 | 1 |
+
+### Root Pattern
+
+All share the same anti-pattern: calling native GObject methods on St.Widget objects that may have been disposed by GNOME Shell's GC. Three defense layers all fail:
+
+1. **`isDisposed()` check-then-use** — TOCTOU race: GC can dispose between check and use
+2. **JS truthiness checks** (`if (obj)`) — disposed GObjects are truthy, not null
+3. **try-catch** — catches JS exceptions but NOT native segfaults from `contains()`, `add_child()`, `remove_child()` on disposed objects
+
+### Fix Strategy: Layered Defense
+
+**Layer 1 — Safe wrapper utilities** (`lib/extension/safe-widget.js`):
+- `isDisposed(obj)` — shared utility (moved from tree.js)
+- `safeCall(obj, method, ...args)` — isDisposed guard + try-catch. Returns `{ok, value}` or `{ok: false}`
+- `safeDestroy(obj, parent)` — safe hide + remove_child + destroy_all_children + destroy
+
+**Layer 2 — JS-side parent tracking** (avoid native `.contains()` entirely):
+- Track which decoration owns which tab via a JS `WeakMap` or flag on the node
+- Replace `decoration.contains(tab)` with `tab._parentDecoration === decoration`
+- Eliminates the most dangerous native call pattern
+
+**Layer 3 — try-catch at point of use** for all remaining native calls:
+- Wrap every native method call site in try-catch
+- On catch: null the reference, log warning, continue gracefully
+
+**Layer 4 — Dangling reference cleanup**:
+- Fix `windowDestroy()` to null `actor.border` and `actor.splitBorder` (currently only nulls local vars)
+- Prevents subsequent code from operating on removed/disposed widgets
+
+### 7-Phase Implementation Plan
+
+| Phase | Scope | Files | Locations | Priority |
+|-------|-------|-------|-----------|----------|
+| 1 | Safe utility module | safe-widget.js (new) | N/A | Foundation |
+| 2 | processTabbed() crash site | tree.js | 4 locations | Critical |
+| 3 | Remaining tree.js | tree.js | 6 locations | High |
+| 4 | showWindowBorders | window.js | 5 locations | High |
+| 5 | Cleanup/destroy paths | window.js | 4 locations | High |
+| 6 | Decoration layout + misc | window.js | 6 locations | Medium |
+| 7 | utils.js + integration test | utils.js | 1 location | Medium |
+
+Each phase: write TDD tests first → implement fix → run tests → verify no regressions.
